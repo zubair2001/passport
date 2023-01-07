@@ -9,20 +9,20 @@ require ('dotenv').config();
 const app = express();
 
 // Passport Config
-require('./config/passport');
-require('./config/OAuth');
+require('./config/OAuth')(passport);
+// require('./config/passport');
 
 // Connect to MongoDB
 mongoose.set('strictQuery', false);
 mongoose
-  .connect(
-    process.env.MONGODB,
-    { useNewUrlParser: true ,useUnifiedTopology: true}
+.connect(
+  process.env.MONGODB,
+  { useNewUrlParser: true ,useUnifiedTopology: true}
   )
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
-
-// EJS
+  
+  // EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
@@ -62,7 +62,6 @@ app.get('/auth/google/callback',
     // Successful authentication, redirect home.
     res.redirect('/dashboard');
   });
-
 // Routes
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
