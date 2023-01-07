@@ -5,11 +5,13 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 require ('dotenv').config();
+const cors = require('cors')
+app.use(cors())
 
 const app = express();
 
 // Passport Config
-require('./config/OAuth')(passport);
+require('./config/OAuth');
 // require('./config/passport');
 
 // Connect to MongoDB
@@ -25,6 +27,8 @@ mongoose
   // EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+
+app.use(express.json());
 
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
