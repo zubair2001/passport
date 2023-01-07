@@ -4,20 +4,19 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
+require ('dotenv').config();
 
 const app = express();
 
 // Passport Config
-require('./config/passport')(passport);
-
-// DB Config
-const db = require('./config/keys').mongoURI;
+require('./config/passport');
+require('./config/OAuth');
 
 // Connect to MongoDB
 mongoose.set('strictQuery', false);
 mongoose
   .connect(
-    db,
+    process.env.MONGODB,
     { useNewUrlParser: true ,useUnifiedTopology: true}
   )
   .then(() => console.log('MongoDB Connected'))
@@ -54,10 +53,18 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/dashboard');
+  });
+
 // Routes
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, console.log(`Server running on  ${PORT}`));
+const port =process.env.EXPRESS_PORT;
+app.listen(port, console.log(`Server running on  ${port}`));
